@@ -198,10 +198,13 @@ const Home = ({ setOpen, setMsg }) => {
                 <TableCell sx={{ whiteSpace: "nowrap" }}>
                   <Typography fontWeight={700}>URL</Typography>
                 </TableCell>
-                <TableCell sx={{ whiteSpace: "nowrap" }}>
+                <TableCell sx={{ whiteSpace: "nowrap" , textAlign:"center"}}>
                   <Typography fontWeight={700}>Purpose</Typography>
                 </TableCell>
-                <TableCell sx={{ whiteSpace: "nowrap" }}>
+                <TableCell sx={{ whiteSpace: "nowrap" , textAlign:"center"}}>
+                  <Typography fontWeight={700}>Total Clicks</Typography>
+                </TableCell>
+                <TableCell sx={{ whiteSpace: "nowrap" , textAlign:"center"}}>
                   <Typography fontWeight={700}>Actions</Typography>
                 </TableCell>
               </TableRow>
@@ -243,10 +246,13 @@ const Home = ({ setOpen, setMsg }) => {
                       </IconButton>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                  <TableCell sx={{ whiteSpace: "nowrap" , textAlign:"center"}}>
                     {url.purpose}
                   </TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                  <TableCell sx={{ whiteSpace: "nowrap" , textAlign:"center"}}>
+                    {url.history.length}
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" , textAlign:"center"}}>
                     <IconButton
                       onClick={() => deleteRow(url._id)}
                       color="secondary"
