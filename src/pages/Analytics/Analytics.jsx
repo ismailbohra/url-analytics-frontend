@@ -42,7 +42,6 @@ function Analytics() {
     fetchData();
   }, []);
 
-
   const prepareAccessHistoryChartData = (data) => {
     const accessCounts = {};
   
@@ -53,7 +52,7 @@ function Analytics() {
         timestamp.getMonth(),
         timestamp.getDate(),
         timestamp.getHours()
-      );
+      ).getTime(); // Ensure we get the correct timestamp
   
       if (!accessCounts[hour]) {
         accessCounts[hour] = 0;
@@ -63,15 +62,15 @@ function Analytics() {
     });
   
     let seriesData = Object.keys(accessCounts).map((timestamp) => ({
-      x: new Date(timestamp),
+      x: parseInt(timestamp), // Use the timestamp directly without converting it to Date again
       y: accessCounts[timestamp],
     }));
   
     // Sort series data by timestamp
-    seriesData = seriesData.sort((a, b) => new Date(a.x) - new Date(b.x));
+    seriesData = seriesData.sort((a, b) => a.x - b.x);
   
     // Calculate the maximum y value
-    const maxY = Math.max(...seriesData.map(d => d.y));
+    const maxY = Math.max(...seriesData.map((d) => d.y));
     // Set the y-axis max to be slightly higher than the maximum y value
     const yAxisMax = Math.ceil(maxY * 1.1);
   
@@ -90,15 +89,17 @@ function Analytics() {
         xaxis: {
           type: "datetime",
           labels: {
-            format: "dd MMM HH:mm",
-          },
+            formatter: function(value) {
+              return new Date(value).toLocaleString();
+            }
+          }
         },
         yaxis: {
           labels: {
             formatter: (value) => Math.floor(value), // Ensure labels are whole numbers
           },
           tickAmount: yAxisMax,
-          max: yAxisMax // Ensure the y-axis max value is slightly higher than the maximum data value
+          max: yAxisMax, // Ensure the y-axis max value is slightly higher than the maximum data value
         },
         title: {
           text: "Access History",
@@ -107,25 +108,26 @@ function Analytics() {
     };
   };
   
+
   const prepareUserDistributionChartData = (data) => {
     const deviceCounts = { Mobile: 0, Desktop: 0, Unique: new Set() };
-  
+
     data.forEach((entry) => {
       deviceCounts[entry.deviceType] += 1;
       deviceCounts.Unique.add(entry.ipaddress);
     });
-  
+
     const seriesData = [
       { x: "Mobile", y: deviceCounts.Mobile },
       { x: "Desktop", y: deviceCounts.Desktop },
       { x: "Unique Users", y: deviceCounts.Unique.size },
     ];
-  
+
     // Calculate the maximum y value
-    const maxY = Math.max(...seriesData.map(d => d.y));
+    const maxY = Math.max(...seriesData.map((d) => d.y));
     // Set the y-axis max to be slightly higher than the maximum y value
     const yAxisMax = Math.ceil(maxY * 1.1);
-  
+
     return {
       series: [
         {
@@ -146,7 +148,7 @@ function Analytics() {
             formatter: (value) => Math.floor(value), // Ensure labels are whole numbers
           },
           tickAmount: yAxisMax,
-          max: yAxisMax // Ensure the y-axis max value is slightly higher than the maximum data value
+          max: yAxisMax, // Ensure the y-axis max value is slightly higher than the maximum data value
         },
         title: {
           text: "User Distribution",
@@ -154,9 +156,8 @@ function Analytics() {
       },
     };
   };
-  
-  const accessHistoryData = prepareAccessHistoryChartData(sampleData);
 
+  const accessHistoryData = prepareAccessHistoryChartData(sampleData);
 
   const userDistributionData = prepareUserDistributionChartData(sampleData);
   function formatTimestamp(timestamp) {
