@@ -42,9 +42,10 @@ function Analytics() {
     fetchData();
   }, []);
 
+
   const prepareAccessHistoryChartData = (data) => {
     const accessCounts = {};
-
+  
     data.forEach((entry) => {
       const timestamp = new Date(entry.timestamp);
       const hour = new Date(
@@ -53,22 +54,27 @@ function Analytics() {
         timestamp.getDate(),
         timestamp.getHours()
       );
-
+  
       if (!accessCounts[hour]) {
         accessCounts[hour] = 0;
       }
-
+  
       accessCounts[hour] += 1;
     });
-
+  
     let seriesData = Object.keys(accessCounts).map((timestamp) => ({
       x: new Date(timestamp),
       y: accessCounts[timestamp],
     }));
-
+  
     // Sort series data by timestamp
     seriesData = seriesData.sort((a, b) => new Date(a.x) - new Date(b.x));
-
+  
+    // Calculate the maximum y value
+    const maxY = Math.max(...seriesData.map(d => d.y));
+    // Set the y-axis max to be slightly higher than the maximum y value
+    const yAxisMax = Math.ceil(maxY * 1.1);
+  
     return {
       series: [
         {
@@ -87,29 +93,39 @@ function Analytics() {
             format: "dd MMM HH:mm",
           },
         },
+        yaxis: {
+          labels: {
+            formatter: (value) => Math.floor(value), // Ensure labels are whole numbers
+          },
+          tickAmount: yAxisMax,
+          max: yAxisMax // Ensure the y-axis max value is slightly higher than the maximum data value
+        },
         title: {
           text: "Access History",
         },
       },
     };
   };
-
-  const accessHistoryData = prepareAccessHistoryChartData(sampleData);
-
+  
   const prepareUserDistributionChartData = (data) => {
-    const deviceCounts = { Mobile: 0, Windows: 0, Unique: new Set() };
-
+    const deviceCounts = { Mobile: 0, Desktop: 0, Unique: new Set() };
+  
     data.forEach((entry) => {
       deviceCounts[entry.deviceType] += 1;
-      deviceCounts.Unique.add(entry.ip);
+      deviceCounts.Unique.add(entry.ipaddress);
     });
-
+  
     const seriesData = [
-      { x: "Mobile Users", y: deviceCounts.Mobile },
-      { x: "Windows Users", y: deviceCounts.Windows },
+      { x: "Mobile", y: deviceCounts.Mobile },
+      { x: "Desktop", y: deviceCounts.Desktop },
       { x: "Unique Users", y: deviceCounts.Unique.size },
     ];
-
+  
+    // Calculate the maximum y value
+    const maxY = Math.max(...seriesData.map(d => d.y));
+    // Set the y-axis max to be slightly higher than the maximum y value
+    const yAxisMax = Math.ceil(maxY * 1.1);
+  
     return {
       series: [
         {
@@ -125,12 +141,22 @@ function Analytics() {
         xaxis: {
           type: "category",
         },
+        yaxis: {
+          labels: {
+            formatter: (value) => Math.floor(value), // Ensure labels are whole numbers
+          },
+          tickAmount: yAxisMax,
+          max: yAxisMax // Ensure the y-axis max value is slightly higher than the maximum data value
+        },
         title: {
           text: "User Distribution",
         },
       },
     };
   };
+  
+  const accessHistoryData = prepareAccessHistoryChartData(sampleData);
+
 
   const userDistributionData = prepareUserDistributionChartData(sampleData);
   function formatTimestamp(timestamp) {
@@ -176,7 +202,12 @@ function Analytics() {
 
   return (
     <Container maxWidth="lg" sx={{ marginTop: 5, marginBottom: 5 }}>
-      <Box display={"flex"} marginBottom={5} alignItems={"center"} justifyContent={"space-between"}>
+      <Box
+        display={"flex"}
+        marginBottom={5}
+        alignItems={"center"}
+        justifyContent={"space-between"}
+      >
         <IconButton onClick={() => back()} color="primary" size="small">
           <HomeOutlined />
         </IconButton>
