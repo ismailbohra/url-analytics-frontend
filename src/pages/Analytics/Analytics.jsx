@@ -224,6 +224,9 @@ function Analytics() {
               <TableCell sx={{ whiteSpace: "nowrap" }}>
                 <Typography fontWeight={700}>Device Type</Typography>
               </TableCell>
+              <TableCell sx={{ whiteSpace: "nowrap" }}>
+                <Typography fontWeight={700}>Source</Typography>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -233,6 +236,7 @@ function Analytics() {
                 <TableCell>{log.ipaddress}</TableCell>
                 <TableCell>{formatTimestamp(log.timestamp)}</TableCell>
                 <TableCell>{log.deviceType}</TableCell>
+                <TableCell>{log.referer}</TableCell>
               </TableRow>
             ))}
           </TableBody>
